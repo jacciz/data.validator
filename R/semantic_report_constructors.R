@@ -20,7 +20,7 @@ segment <- function(title, ...) {
 #' @return Modal content.
 #' @keywords internal
 prepare_modal_content <- function(error, df_error_head_n) {
-  data_part <- NULL #nolint: object_usage_linter
+  data_part <- NULL # nolint: object_usage_linter
   errors_number <- seq_along(error$error_df[[1]])
   purrr::map(errors_number, ~ {
     data_part <-
@@ -173,7 +173,6 @@ make_accordion_container <- function(...) {
   htmltools::tagList(
     htmltools::div(class = "ui styled accordion", style = "width:100%", ...)
   )
-
 }
 
 #' Create a UI accordion element.
@@ -188,14 +187,13 @@ make_accordion_container <- function(...) {
 #' @return Accordion.
 #' @keywords internal
 make_accordion_element <- function(
-  results,
-  color = "green",
-  label,
-  active = FALSE,
-  type,
-  mark,
-  df_error_head_n
-) {
+    results,
+    color = "green",
+    label,
+    active = FALSE,
+    type,
+    mark,
+    df_error_head_n) {
   state <- NULL
   if (active) {
     state <- "active"
@@ -252,7 +250,7 @@ display_results <- function(data, n_passes, n_fails, n_warns, df_error_head_n) {
     segment_title,
     htmltools::p(),
     make_accordion_container(
-      if (!is.null(n_fails))
+      if (!is.null(n_fails)) {
         make_accordion_element(
           results = results_failed,
           color = label_color_negative,
@@ -261,23 +259,27 @@ display_results <- function(data, n_passes, n_fails, n_warns, df_error_head_n) {
           type = error_id,
           active = is_negative_active,
           df_error_head_n = df_error_head_n
-        ),
-      if (!is.null(n_warns))
+        )
+      },
+      if (!is.null(n_warns)) {
         make_accordion_element(
           results = results_warning,
           color = label_color_neutral,
           label = "Warnings",
           mark = "big blue exclamation circle",
           type = warning_id,
-          active = is_neutral_active
-        ),
-      if (!is.null(n_passes))
+          active = is_neutral_active,
+          df_error_head_n = df_error_head_n
+        )
+      },
+      if (!is.null(n_passes)) {
         make_accordion_element(
           results = results_passed,
           label = "Passed",
           type = success_id,
           mark = "big green checkmark"
         )
+      }
     )
   )
   code
@@ -346,19 +348,21 @@ make_summary_table <- function(n_passes, n_fails, n_warns) {
 #' @return HTML validation report.
 #' @keywords internal
 get_semantic_report_ui <- function(
-  n_passes,
-  n_fails,
-  n_warns,
-  validation_results,
-  df_error_head_n
-) {
+    n_passes,
+    n_fails,
+    n_warns,
+    validation_results,
+    df_error_head_n) {
   summary_table <- make_summary_table(n_passes, n_fails, n_warns)
-  unique_objects <- validation_results %>% dplyr::pull(.data$table_name) %>% unique()
-  html_report <- unique_objects %>% purrr::map(~ {
-    validation_results %>%
-      dplyr::filter(.data$table_name == .x) %>%
-      display_results(n_passes, n_fails, n_warns, df_error_head_n)
-  }) %>%
+  unique_objects <- validation_results %>%
+    dplyr::pull(.data$table_name) %>%
+    unique()
+  html_report <- unique_objects %>%
+    purrr::map(~ {
+      validation_results %>%
+        dplyr::filter(.data$table_name == .x) %>%
+        display_results(n_passes, n_fails, n_warns, df_error_head_n)
+    }) %>%
     htmltools::div()
 
   htmltools::div(summary_table, html_report)
@@ -394,15 +398,21 @@ render_semantic_report_ui <- function(validation_results,
   n_passes <- NULL
   n_fails <- NULL
   n_warns <- NULL
-  if (success) n_passes <- length(
-    unique(validation_results[validation_results$type == success_id, ]$assertion.id)
-  )
-  if (warning) n_warns <- length(
-    unique(validation_results[validation_results$type == warning_id, ]$assertion.id)
-  )
-  if (error) n_fails <- length(
-    unique(validation_results[validation_results$type == error_id, ]$assertion.id)
-  )
+  if (success) {
+    n_passes <- length(
+      unique(validation_results[validation_results$type == success_id, ]$assertion.id)
+    )
+  }
+  if (warning) {
+    n_warns <- length(
+      unique(validation_results[validation_results$type == warning_id, ]$assertion.id)
+    )
+  }
+  if (error) {
+    n_fails <- length(
+      unique(validation_results[validation_results$type == error_id, ]$assertion.id)
+    )
+  }
   get_semantic_report_ui(
     n_passes,
     n_fails,
@@ -445,7 +455,8 @@ render_raw_report_ui <- function(validation_results, success = TRUE, warning = T
       knitr::kable(
         tidyr::unnest(validation_results, .data$error_df, keep_empty = TRUE) %>%
           dplyr::filter(.data$type %in% types),
-        "html", align = NULL, table.attr = "class=\"ui cellable table\""
+        "html",
+        align = NULL, table.attr = "class=\"ui cellable table\""
       )
     )
   )
